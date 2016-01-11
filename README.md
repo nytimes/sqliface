@@ -1,6 +1,6 @@
 # sqli
 
- [![GoDoc](https://godoc.org/github.com/NYTimes/sqli?status.svg)](https://godoc.org/github.com/NYtimes/sqli) [![Build Status](https://travis-ci.org/NYTimes/sqli.svg?branch=master)](https://travis-ci.org/NYTimes/sqli)
+ [![GoDoc](https://godoc.org/github.com/NYTimes/sqli?status.svg)](https://godoc.org/github.com/NYTimes/sqli) [![Build Status](https://travis-ci.org/NYTimes/sqli.svg?branch=master)](https://travis-ci.org/NYTimes/sqli)
 
 `sqli` is a package for the Go programming language that contains a set of interfaces and implementations that help make code utilizing `database/sql` more testable.
 
