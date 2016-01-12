@@ -708,3 +708,13 @@ func TestScanNoNull(t *testing.T) {
 		t.Errorf("expected:\n%#v\ngot:\n%#v", want, got)
 	}
 }
+
+func TestTypeError(t *testing.T) {
+	err := newTypeError("int", "hi mom")
+	want := "expected int, but got 'hi mom' type string"
+	got := err.Error()
+
+	if want != got {
+		t.Errorf("expected '%#v', got '%#v'", want, got)
+	}
+}
