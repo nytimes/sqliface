@@ -9,3 +9,4 @@ For documentation check out the [GoDoc](https://godoc.org/github.com/NYtimes/sql
 ## Examples
 
 Check out the [examples](examples/) directory for examples on how to use this package.
+
