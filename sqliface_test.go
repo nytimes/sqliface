@@ -711,7 +711,7 @@ func TestScanNoNull(t *testing.T) {
 
 func TestTypeError(t *testing.T) {
 	err := newTypeError("int", "hi mom")
-	want := "expected int, but got 'hi mom' type string"
+	want := "expected int, but got hi mom of type string"
 	got := err.Error()
 
 	if want != got {
