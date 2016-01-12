@@ -1,32 +1,33 @@
-package sqli
+package sqliface
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
 )
 
-// RowScanner is an interface implemented by sql.Row, sql.Rows, and MockRow.
-type RowScanner interface {
+// Row is an interface implemented by sql.Row, sql.Rows, and MockRow.
+type Row interface {
 	Scan(dest ...interface{}) error
 }
 
-// RowsScanner is an interface implemented by sql.Rows and MockRows.
-type RowsScanner interface {
+// Rows is an interface implemented by sql.Rows and MockRows.
+type Rows interface {
 	Next() bool
 	Scan(dest ...interface{}) error
 	Err() error
 	Close() error
 }
 
-// MockRow is database row that implements RowScanner to help test applications
+// MockRow is database row that implements Row to help test applications
 // using database/sql.
 type MockRow []interface{}
 
-// MockRows is a set of database rows that implements RowsScanner to help test applications
+// MockRows is a set of database rows that implements Rows to help test applications
 // using database/sql.
 type MockRows struct {
 	Rows   []MockRow
@@ -87,7 +88,31 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *int:
 			mrVal, ok := mr[i].(int)
 			if !ok {
-				return fmt.Errorf("Expected int but got %v of type %T", mr[i], mr[i])
+				return newTypeError("int", mr[i])
+			}
+
+			*dVal = mrVal
+
+		case *int8:
+			mrVal, ok := mr[i].(int8)
+			if !ok {
+				return newTypeError("int8", mr[i])
+			}
+
+			*dVal = mrVal
+
+		case *int16:
+			mrVal, ok := mr[i].(int16)
+			if !ok {
+				return newTypeError("int16", mr[i])
+			}
+
+			*dVal = mrVal
+
+		case *int32:
+			mrVal, ok := mr[i].(int32)
+			if !ok {
+				return newTypeError("int32", mr[i])
 			}
 
 			*dVal = mrVal
@@ -95,15 +120,31 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *int64:
 			mrVal, ok := mr[i].(int64)
 			if !ok {
-				return fmt.Errorf("Expected int64 but got %v of type %T", mr[i], mr[i])
+				return newTypeError("int64", mr[i])
 			}
 
 			*dVal = mrVal
 
-		case *uint64:
-			mrVal, ok := mr[i].(uint64)
+		case *uint:
+			mrVal, ok := mr[i].(uint)
 			if !ok {
-				return fmt.Errorf("Expected uint64 but got %v of type %T", mr[i], mr[i])
+				return newTypeError("uint", mr[i])
+			}
+
+			*dVal = mrVal
+
+		case *uint8:
+			mrVal, ok := mr[i].(uint8)
+			if !ok {
+				return newTypeError("uint8", mr[i])
+			}
+
+			*dVal = mrVal
+
+		case *uint16:
+			mrVal, ok := mr[i].(uint16)
+			if !ok {
+				return newTypeError("uint16", mr[i])
 			}
 
 			*dVal = mrVal
@@ -111,21 +152,46 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *uint32:
 			mrVal, ok := mr[i].(uint32)
 			if !ok {
-				return fmt.Errorf("Expected uint32 but got %v of type %T", mr[i], mr[i])
+				return newTypeError("uint32", mr[i])
 			}
 
 			*dVal = mrVal
+
+		case *uint64:
+			mrVal, ok := mr[i].(uint64)
+			if !ok {
+				return newTypeError("uint64", mr[i])
+			}
+
+			*dVal = mrVal
+
+		case *float32:
+			mrVal, ok := mr[i].(float32)
+			if !ok {
+				return newTypeError("float32", mr[i])
+			}
+
+			*dVal = mrVal
+
+		case *float64:
+			mrVal, ok := mr[i].(float64)
+			if !ok {
+				return newTypeError("float64", mr[i])
+			}
+
+			*dVal = mrVal
+
 		case *string:
 			mrVal, ok := mr[i].(string)
 			if !ok {
-				return fmt.Errorf("Expected string but got %v of type %T", mr[i], mr[i])
+				return newTypeError("string", mr[i])
 			}
 			*dVal = mrVal
 
 		case *time.Time:
 			mrVal, ok := mr[i].(time.Time)
 			if !ok {
-				return fmt.Errorf("Expected time.Time but got %v of type %T", mr[i], mr[i])
+				return newTypeError("time.Time", mr[i])
 			}
 			*dVal = mrVal
 
@@ -135,7 +201,15 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *bool:
 			mrVal, ok := mr[i].(bool)
 			if !ok {
-				return fmt.Errorf("Expected bool but got %v of type %T", mr[i], mr[i])
+				return newTypeError("bool", mr[i])
+			}
+
+			*dVal = mrVal
+
+		case *sql.RawBytes:
+			mrVal, ok := mr[i].([]byte)
+			if !ok {
+				return newTypeError("sql.RawBytes", mr[i])
 			}
 
 			*dVal = mrVal
@@ -149,6 +223,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 				dVal.Valid = true
 				dVal.String = mrVal
 			}
+
 		case *sql.NullInt64:
 			mrVal, ok := mr[i].(int64)
 			if !ok {
@@ -160,12 +235,25 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			}
 
 		default:
-			return fmt.Errorf("scanning not implemented for %v of type %T, but you can add the implementation in MockRow.Scan()", dVal, dVal)
+			return fmt.Errorf("scanning not implemented for type %T, but you can add the implementation in MockRow.Scan()", dVal, dVal)
 
 		}
 	}
 
 	return nil
+}
+
+type TypeError struct {
+	Expected string
+	Got      interface{}
+}
+
+func newTypeError(exp string, got interface{}) *TypeError {
+	return &TypeError{exp, got}
+}
+
+func (t *TypeError) Error() string {
+	return fmt.Sprintf("expected %s, but got %v of type %T", t.Expected, t.Got, t.Got)
 }
 
 // Execer is an interface that both sql.Tx and sql.DB implement. Using this
@@ -174,4 +262,11 @@ type Execer interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 	QueryRow(query string, args ...interface{}) *sql.Row
+}
+
+// ExecCloser implements the Execer interface with an additional Close method. Using this will allow you
+// to test simple uses of sql.DB in a service.
+type ExecCloser interface {
+	Execer
+	io.Closer
 }
