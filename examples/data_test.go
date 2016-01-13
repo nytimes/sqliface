@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
@@ -16,7 +15,7 @@ func TestScanData(t *testing.T) {
 		given *sqliface.MockRows
 
 		want       []Data
-		wantErr    bool
+		wantErr    error
 		wantClosed bool
 	}{
 		{
@@ -36,7 +35,7 @@ func TestScanData(t *testing.T) {
 				Data{123, "JP"},
 				Data{1234, "George"},
 			},
-			false,
+			nil,
 			false,
 		},
 		{
@@ -48,50 +47,26 @@ func TestScanData(t *testing.T) {
 					"",
 				}),
 
-			[]Data{},
+			[]Data(nil),
+			sqliface.NewTypeError("uint64", uint32(1234)),
 			true,
-			true,
-		},
-		{
-			"ScanData rows error",
-
-			sqliface.NewMockRows(
-				sqliface.MockRow{
-					uint64(1234),
-					nil,
-				}),
-
-			[]Data{},
-			true,
-			false,
 		},
 	}
 
 	for _, test := range tests {
-		if test.wantErr {
-			test.given.Error = errors.New("an error!")
-		}
-
 		got, gotErr := scanDatas(test.given)
 
 		if test.wantClosed && !test.given.Closed {
 			t.Errorf("TEST[%s] scanDatas(..) did not close the rows struct after an error", test.name)
 		}
 
-		if test.wantErr {
-			if gotErr == nil {
-				t.Errorf("TEST[%s] scanDatas(..) did not return with error when one was expected", test.name)
-			}
-			continue
-		}
-
-		if gotErr != nil {
-			t.Errorf("TEST[%s] scanDatas(..) returned with unexpected error:\n%s", test.name, gotErr)
+		if !reflect.DeepEqual(gotErr, test.wantErr) {
+			t.Errorf("TEST[%s] scanDatas(..) got error of:\n%#v\n\nexpected:\n%#v:", test.name, gotErr, test.wantErr)
 			continue
 		}
 
 		if !reflect.DeepEqual(got, test.want) {
-			t.Errorf("TEST[%s] scanDatas(..) got:\n%+v\n expected:\n%+v", test.name, got, test.want)
+			t.Errorf("TEST[%s] scanDatas(..) got:\n%#v\n expected:\n%#v", test.name, got, test.want)
 		}
 	}
 }

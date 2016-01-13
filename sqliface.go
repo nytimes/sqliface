@@ -88,7 +88,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *int:
 			mrVal, ok := mr[i].(int)
 			if !ok {
-				return newTypeError("int", mr[i])
+				return NewTypeError("int", mr[i])
 			}
 
 			*dVal = mrVal
@@ -96,7 +96,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *int8:
 			mrVal, ok := mr[i].(int8)
 			if !ok {
-				return newTypeError("int8", mr[i])
+				return NewTypeError("int8", mr[i])
 			}
 
 			*dVal = mrVal
@@ -104,7 +104,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *int16:
 			mrVal, ok := mr[i].(int16)
 			if !ok {
-				return newTypeError("int16", mr[i])
+				return NewTypeError("int16", mr[i])
 			}
 
 			*dVal = mrVal
@@ -112,7 +112,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *int32:
 			mrVal, ok := mr[i].(int32)
 			if !ok {
-				return newTypeError("int32", mr[i])
+				return NewTypeError("int32", mr[i])
 			}
 
 			*dVal = mrVal
@@ -120,7 +120,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *int64:
 			mrVal, ok := mr[i].(int64)
 			if !ok {
-				return newTypeError("int64", mr[i])
+				return NewTypeError("int64", mr[i])
 			}
 
 			*dVal = mrVal
@@ -128,7 +128,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *uint:
 			mrVal, ok := mr[i].(uint)
 			if !ok {
-				return newTypeError("uint", mr[i])
+				return NewTypeError("uint", mr[i])
 			}
 
 			*dVal = mrVal
@@ -136,7 +136,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *uint8:
 			mrVal, ok := mr[i].(uint8)
 			if !ok {
-				return newTypeError("uint8", mr[i])
+				return NewTypeError("uint8", mr[i])
 			}
 
 			*dVal = mrVal
@@ -144,7 +144,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *uint16:
 			mrVal, ok := mr[i].(uint16)
 			if !ok {
-				return newTypeError("uint16", mr[i])
+				return NewTypeError("uint16", mr[i])
 			}
 
 			*dVal = mrVal
@@ -152,7 +152,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *uint32:
 			mrVal, ok := mr[i].(uint32)
 			if !ok {
-				return newTypeError("uint32", mr[i])
+				return NewTypeError("uint32", mr[i])
 			}
 
 			*dVal = mrVal
@@ -160,7 +160,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *uint64:
 			mrVal, ok := mr[i].(uint64)
 			if !ok {
-				return newTypeError("uint64", mr[i])
+				return NewTypeError("uint64", mr[i])
 			}
 
 			*dVal = mrVal
@@ -168,7 +168,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *float32:
 			mrVal, ok := mr[i].(float32)
 			if !ok {
-				return newTypeError("float32", mr[i])
+				return NewTypeError("float32", mr[i])
 			}
 
 			*dVal = mrVal
@@ -176,7 +176,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *float64:
 			mrVal, ok := mr[i].(float64)
 			if !ok {
-				return newTypeError("float64", mr[i])
+				return NewTypeError("float64", mr[i])
 			}
 
 			*dVal = mrVal
@@ -184,14 +184,14 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *string:
 			mrVal, ok := mr[i].(string)
 			if !ok {
-				return newTypeError("string", mr[i])
+				return NewTypeError("string", mr[i])
 			}
 			*dVal = mrVal
 
 		case *time.Time:
 			mrVal, ok := mr[i].(time.Time)
 			if !ok {
-				return newTypeError("time.Time", mr[i])
+				return NewTypeError("time.Time", mr[i])
 			}
 			*dVal = mrVal
 
@@ -201,7 +201,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *bool:
 			mrVal, ok := mr[i].(bool)
 			if !ok {
-				return newTypeError("bool", mr[i])
+				return NewTypeError("bool", mr[i])
 			}
 
 			*dVal = mrVal
@@ -209,7 +209,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 		case *sql.RawBytes:
 			mrVal, ok := mr[i].([]byte)
 			if !ok {
-				return newTypeError("sql.RawBytes", mr[i])
+				return NewTypeError("sql.RawBytes", mr[i])
 			}
 
 			*dVal = mrVal
@@ -243,15 +243,20 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 	return nil
 }
 
+// TypeError is returned by MockRow.Scan when the type it's attempting
+// to scan into does not match the type in the MockRow.
 type TypeError struct {
 	Expected string
 	Got      interface{}
 }
 
-func newTypeError(exp string, got interface{}) *TypeError {
+// NewTypeError returns a TypeError instance. This can helpful to use
+// when testing for errors while scanning from databases.
+func NewTypeError(exp string, got interface{}) *TypeError {
 	return &TypeError{exp, got}
 }
 
+// Error allows TypeError to implement the error interface.
 func (t *TypeError) Error() string {
 	return fmt.Sprintf("expected %s, but got %v of type %T", t.Expected, t.Got, t.Got)
 }
