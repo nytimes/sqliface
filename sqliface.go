@@ -235,7 +235,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			}
 
 		default:
-			return fmt.Errorf("scanning not implemented for type %T, but you can add the implementation in MockRow.Scan()", dVal, dVal)
+			return fmt.Errorf("scanning not implemented for type %T, but you can add the implementation in MockRow.Scan()", dVal)
 
 		}
 	}
