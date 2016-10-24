@@ -3,7 +3,8 @@ package models
 import (
 	"database/sql"
 
-	"github.com/NYTimes/gizmo/config"
+	"github.com/NYTimes/gizmo/config/mysql"
+
 	"github.com/NYTimes/sqliface"
 )
 
@@ -24,7 +25,7 @@ type (
 	}
 )
 
-func NewMySQLDataRepo(cfg *config.MySQL) (DataRepo, error) {
+func NewMySQLDataRepo(cfg *mysql.Config) (DataRepo, error) {
 	db, err := cfg.DB()
 	return &MySQLDataRepo{db}, err
 }
