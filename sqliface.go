@@ -221,7 +221,7 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			}
 
 		default:
-			return fmt.Errorf("scanning type not yet supported for %#v at index %d - , but you can add the implementation in MockRow.Scan()",
+			return fmt.Errorf("scanning type not yet supported for %#v at index %d, but you can add the implementation in MockRow.Scan()",
 				dVal, i)
 		}
 	}
