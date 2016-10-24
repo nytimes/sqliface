@@ -90,7 +90,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("int", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *int8:
@@ -98,7 +97,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("int8", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *int16:
@@ -106,7 +104,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("int16", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *int32:
@@ -114,7 +111,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("int32", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *int64:
@@ -122,7 +118,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("int64", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *uint:
@@ -130,7 +125,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("uint", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *uint8:
@@ -138,7 +132,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("uint8", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *uint16:
@@ -146,7 +139,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("uint16", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *uint32:
@@ -154,7 +146,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("uint32", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *uint64:
@@ -162,7 +153,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("uint64", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *float32:
@@ -170,7 +160,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("float32", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *float64:
@@ -178,7 +167,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("float64", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *string:
@@ -203,7 +191,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("bool", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *sql.RawBytes:
@@ -211,7 +198,6 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			if !ok {
 				return NewTypeError("sql.RawBytes", mr[i])
 			}
-
 			*dVal = mrVal
 
 		case *sql.NullString:
@@ -235,8 +221,8 @@ func (mr MockRow) Scan(dest ...interface{}) error {
 			}
 
 		default:
-			return fmt.Errorf("scanning not implemented for type %T, but you can add the implementation in MockRow.Scan()", dVal)
-
+			return fmt.Errorf("scanning type not yet supported for %#v at index %d, but you can add the implementation in MockRow.Scan()",
+				dVal, i)
 		}
 	}
 
