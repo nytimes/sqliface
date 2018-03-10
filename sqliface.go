@@ -1,6 +1,7 @@
 package sqliface
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -251,8 +252,11 @@ func (t *TypeError) Error() string {
 // interface will allow you to pass either into a function.
 type Execer interface {
 	Exec(query string, args ...interface{}) (sql.Result, error)
+	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 	Query(query string, args ...interface{}) (*sql.Rows, error)
+	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
 	QueryRow(query string, args ...interface{}) *sql.Row
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
 }
 
 // ExecCloser implements the Execer interface with an additional Close method. Using this will allow you
