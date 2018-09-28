@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/NYTimes/sqliface"
+	"github.com/nytimes/sqliface"
 )
 
 func TestScanData(t *testing.T) {
